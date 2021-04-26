@@ -59,7 +59,7 @@ d3.csv("data.csv").then(function(demoData) {
 
     // Step 5: Create Circles
     // ==============================
-    var circlesGroup = chartGroup.selectAll("circle")
+    var circlesGroup = chartGroup.selectAll("null")
     .data(demoData)
     .enter()
     .append("circle")
@@ -68,19 +68,7 @@ d3.csv("data.csv").then(function(demoData) {
     .attr("r", "10")
     .attr("fill", "lightblue")
     .attr("opacity", ".5");
-
-    // From Andy's code
-    var fontSize = 10;
-    var abbrGroup = chartGroup.selectAll("null")
-        .data(demoData)
-        .enter()
-        .append("circle")
-        // .attr('anchor', 'center')
-        .text(d => d.abbr)
-        .attr('x', d => xLinearScale(d.poverty))
-        .attr('y', d => yLinearScale(d.healthcare)+fontSize/2)
-        .attr('font-size', `${fontSize}px`)
-        .classed('stateText', true);
+    
 
     // Step 6: Initialize tool tip
     // ==============================
@@ -100,7 +88,7 @@ d3.csv("data.csv").then(function(demoData) {
     circlesGroup.on("click", function(data) {
       toolTip.show(data, this);
     })
-      // onmouseout event
+      // // onmouseout event
       .on("mouseout", function(data, index) {
         toolTip.hide(data);
       });
@@ -112,12 +100,12 @@ d3.csv("data.csv").then(function(demoData) {
       .attr("x", 0 - (height / 2))
       .attr("dy", "1em")
       .attr("class", "axisText")
-      .text("In Poverty (%)");
+      .text("Lacks Healthcare (%)");
 
     chartGroup.append("text")
       .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
       .attr("class", "axisText")
-      .text("Lacks Healthcare (%)");
-  // }).catch(function(error) {
-  //   console.log(error);
+      .text("In Poverty (%)");
+  }).catch(function(error) {
+    console.log(error);
   });
