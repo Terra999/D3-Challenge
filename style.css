@@ -39,7 +39,7 @@ body {
   font: 12px sans-serif;
   color: white;
   text-align: center;
-  background: #551aaf;
+  background: #0b5999;
   border: 0;
   border-radius: 10px;
 }
@@ -47,7 +47,7 @@ body {
 .axisText {
   font-family: sans-serif;
   font-weight: bold;
-  fill: #1d1aaf;
+  fill: #0e648b;
   text-anchor: middle;
 }
 
@@ -58,6 +58,6 @@ body {
 }
 
 .stateCircle {
-  fill: #89bdd3;
+  fill: #156499;
   stroke: #e3e3e3;
 }

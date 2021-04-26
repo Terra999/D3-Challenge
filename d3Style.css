@@ -40,6 +40,13 @@
   margin: 0;
 }
 
+.axis-text {
+  font-family: sans-serif;
+  font-weight: bold;
+  fill: #0d6486;
+  text-anchor: middle;
+}
+
 .d3-tip {
   padding: 6px;
   font-size: 12px;

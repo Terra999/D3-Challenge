@@ -1,4 +1,4 @@
-console.log("data loaded");
+console.log("bonus.js loaded");
 
 var svgWidth = 960;
 var svgHeight = 500;
@@ -6,7 +6,7 @@ var svgHeight = 500;
 var margin = {
   top: 20,
   right: 40,
-  bottom: 60,
+  bottom: 100,
   left: 100
 };
 
@@ -43,7 +43,8 @@ function xScale(demoData, chosenXAxis) {
   
     xAxis.transition()
       .duration(1000)
-      .call(bottomAxis);
+      .call(bottomAxis
+        .ticks(7));
   
     return xAxis;
   }
@@ -65,27 +66,30 @@ function xScale(demoData, chosenXAxis) {
     var label;
   
     if (chosenXAxis === "poverty") {
-      label = "abbr:";
+      label = "Poverty (%):";
+    }
+    else if (chosenXAxis === "age") {
+      label = "Age (Median)";
     }
     else {
-      label = "abbr:";
+      label = "Household Income (Median)";
     }
   
     var toolTip = d3.tip()
       .attr("class", "tooltip")
-      .offset([0, 0])
+      .offset([80, -60])
       .html(function(d) {
-        return (`${d.abbr}`);
+        return (`${d.abbr}<br>${d.label} ${chosenXAxis}`);
       });
   
     circlesGroup.call(toolTip);
   
     circlesGroup.on("mouseover", function(data) {
-      toolTip.show(data);
+      toolTip.show(data, this);
     })
       // onmouseout event
       .on("mouseout", function(data, index) {
-        toolTip.hide(data);
+        toolTip.hide(data, this);
       });
   
     return circlesGroup;
@@ -138,15 +142,14 @@ d3.csv("data.csv").then(function(demoData, err) {
 
     // Step 5: Create Circles
     // ==============================
-    var circlesGroup = chartGroup.selectAll("null")
-    .data(demoData)
-    .enter()
-    .append("circle")
-    .attr("cx", d => xLinearScale(d.chosenXAxis))
-    .attr("cy", d => yLinearScale(d.healthcare))
-    .attr("r", 10)
-    .attr("fill", "lightblue")
-    .attr("opacity", ".5");
+    var circlesGroup = chartGroup.selectAll("circle")
+      .data(demoData)
+      .enter()
+      .append("circle")
+      .attr("cx", d => xLinearScale(d.chosenXAxis))
+      .attr("cy", d => yLinearScale(d.healthcare))
+      .attr("r", 10)
+      .classed("stateCircle", true);
 
     // Create group for 3 x-axis labels
     var labelsGroup = chartGroup.append("g")
@@ -154,51 +157,126 @@ d3.csv("data.csv").then(function(demoData, err) {
 
     // Create axes labels
     var povertyGroup = labelsGroup.append("text")
-      .attr("y", 20)
       .attr("x", 0)
+      .attr("y", 20)
       .attr("value", "poverty")
       .classed("active", true)
-      .text("In Poverty (%)")
+      .text("In Poverty (%)");
 
 
     var ageGroup = labelsGroup.append("text")
-    .attr("y", 20)
-    .attr("x", 0)
-    .attr("value", "age")
-    .classed("active", true)
-    .text("Age (Median)")
+      .attr("x", 0)
+      .attr("y", 40)
+      .attr("value", "age")
+      .classed("active", true)
+      .text("Age (Median)");
 
     var incomeGroup = labelsGroup.append("text")
-    .attr("y", 20)
-    .attr("x", 0)
-    .attr("value", "income")
-    .classed("active", true)
-    .text("Household Income (Median)")
+      .attr("x", 0)
+      .attr("y", 60)
+      .attr("value", "income")
+      .classed("active", true)
+      .text("Household Income (Median)");
 
+      // append y axis
+    chartGroup.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "4em")
+      .classed("axis-text", true)
+      .text("Lacks Healthcare (%)");
 
        // Step 6: Initialize tool tip
     // ==============================
-    var toolTip = d3.tip()
-      .attr("class", "tooltip")
-      .offset([0, 0])
-      .html(function(d) {
-        return (`${d.abbr}`);
-      });
+    // var toolTip = d3.tip()
+    //   .attr("class", "tooltip")
+    //   .offset([0, 0])
+    //   .html(function(d) {
+    //     return (`${d.abbr}`);
+    //   });
 
-    // Step 7: Create tooltip in the chart
-    // ==============================
-    chartGroup.call(toolTip);
+    // updateToolTip function above csv import
+    var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
-    // Step 8: Create event listeners to display and hide the tooltip
-    // ==============================
-    circlesGroup.on("click", function(data) {
-      toolTip.show(data, this);
-    })
-      // // onmouseout event
-      .on("mouseout", function(data, index) {
-        toolTip.hide(data);
-      });
+     // x axis labels event listener
+    labelsGroup.selectAll("text")
+    .on("click", function() {
+      // get value of selection
+      var value = d3.select(this).attr("value");
+      if (value !== chosenXAxis) {
+
+        // replaces chosenXAxis with value
+        chosenXAxis = value;
+
+        console.log(chosenXAxis)
+
+        // functions here found above csv import
+        // updates x scale for new data
+        xLinearScale = xScale(demoData, chosenXAxis);
+
+        // updates x axis with transition
+        xAxis = renderAxes(xLinearScale, xAxis);
+
+        // updates circles with new x values
+        circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
+
+        // updates tooltips with new info
+        circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+
+        // changes classes to change bold text
+        if (chosenXAxis === "age") {
+          ageGroup
+            .classed("active", true)
+            .classed("inactive", false);
+          povertyGroup
+            .classed("active", false)
+            .classed("inactive", true);
+          incomeGroup
+            .classed("active", false)
+            .classed("inactive", true);
+        }
+        else if (chosenXAxis === "poverty")  {
+          ageGroup
+            .classed("active", false)
+            .classed("inactive", true);
+          povertyGroup
+            .classed("active", true)
+            .classed("inactive", false);
+          incomeGroup
+            .classed("active", false)
+            .classed("inactive", true);
+        }
+        else {
+          ageGroup
+          .classed("active", false)
+          .classed("inactive", true);
+        povertyGroup
+          .classed("active", false)
+          .classed("inactive", true);
+        incomeGroup
+          .classed("active", true)
+          .classed("inactive", false);
+        }
+      }
+    });
+  }).catch(function(error) {
+  console.log(error);
   });
+  //   // Step 7: Create tooltip in the chart
+  //   // ==============================
+  //   chartGroup.call(toolTip);
+
+  //   // Step 8: Create event listeners to display and hide the tooltip
+  //   // ==============================
+  //   circlesGroup.on("click", function(data) {
+  //     toolTip.show(data, this);
+  //   })
+  //     // // onmouseout event
+  //     .on("mouseout", function(data, index) {
+  //       toolTip.hide(data);
+  //     });
+  // });
 // }).catch(function(error) {
 //     console.log(error);
 // });

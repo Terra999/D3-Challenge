@@ -90,7 +90,7 @@ d3.csv("data.csv").then(function(demoData) {
       .attr("class", "tooltip")
       .offset([80, -60])
       .html(function(d) {
-        return (`${d.abbr}<br>Poverty %: ${d.poverty}<br>Income: ${d.income}`);
+        return (`${d.abbr}<br>Poverty %: ${d.poverty}<br>Healthcare %: ${d.healthcare}`);
       });
  
 
