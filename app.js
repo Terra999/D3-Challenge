@@ -59,25 +59,36 @@ d3.csv("data.csv").then(function(demoData) {
 
     // Step 5: Create Circles
     // ==============================
-    var circlesGroup = chartGroup.selectAll("null")
-    .data(demoData)
-    .enter()
-    .append("circle")
-    .attr("cx", d => xLinearScale(d.poverty))
-    .attr("cy", d => yLinearScale(d.healthcare))
-    .attr("r", "10")
-    .attr("fill", "lightblue")
-    .attr("opacity", ".5");
+    var circlesGroup = chartGroup.selectAll("circle")
+      .data(demoData)
+      .enter()
+      .append("circle")
+      .attr("cx", d => xLinearScale(d.poverty))
+      .attr("cy", d => yLinearScale(d.healthcare))
+      .attr("r", "10")
+      .classed("stateCircle", true);
+
+    var fontSize = 10;
+    var abbrGroup = chartGroup.selectAll("null")
+        .data(demoData)
+        .enter()
+        .append("text")
+        .text(d => d.abbr)
+        .attr('x', d => xLinearScale(d.poverty))
+        .attr('y', d => yLinearScale(d.healthcare)+fontSize/2)
+        .attr('font-size', `${fontSize}px`)
+        .classed('stateText', true);
     
 
     // Step 6: Initialize tool tip
     // ==============================
     var toolTip = d3.tip()
       .attr("class", "tooltip")
-      .offset([0, 0])
+      .offset([80, -60])
       .html(function(d) {
-        return (`${d.abbr}`);
+        return (`${d.abbr}<br>Poverty %: ${d.poverty}<br>Income: ${d.income}`);
       });
+ 
 
     // Step 7: Create tooltip in the chart
     // ==============================
@@ -90,7 +101,7 @@ d3.csv("data.csv").then(function(demoData) {
     })
       // // onmouseout event
       .on("mouseout", function(data, index) {
-        toolTip.hide(data);
+        toolTip.hide(data, this);
       });
 
     // Create axes labels
