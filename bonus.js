@@ -1,3 +1,4 @@
+// Check that bonus.js loaded
 console.log("bonus.js loaded");
 
 var svgWidth = 960;
@@ -29,8 +30,8 @@ var chosenXAxis = "poverty";
 function xScale(demoData, chosenXAxis) {
     // create scales
     var xLinearScale = d3.scaleLinear()
-      .domain([d3.min(demoData, d => d[chosenXAxis]) * 0.8,
-        d3.max(demoData, d => d[chosenXAxis]) * 1.2
+      .domain([d3.min(demoData, d => d[chosenXAxis]), //* 0.8,
+        d3.max(demoData, d => d[chosenXAxis])  // * 1.2
       ])
       .range([0, width]);
   
@@ -42,9 +43,8 @@ function xScale(demoData, chosenXAxis) {
     var bottomAxis = d3.axisBottom(newXScale);
   
     xAxis.transition()
-      .duration(1000)
-      .call(bottomAxis
-        .ticks(7));
+      .duration(700)
+      .call(bottomAxis);
   
     return xAxis;
   }
@@ -54,7 +54,7 @@ function xScale(demoData, chosenXAxis) {
   function renderCircles(circlesGroup, newXScale, chosenXAxis) {
   
     circlesGroup.transition()
-      .duration(1000)
+      .duration(700)
       .attr("cx", d => newXScale(d[chosenXAxis]));
   
     return circlesGroup;
@@ -108,6 +108,7 @@ d3.csv("data.csv").then(function(demoData, err) {
       data.income = +data.income;
       data.obesity = +data.obesity;
     });
+    
     console.log(demoData);
 
     // xLinearScale function above csv import
@@ -151,6 +152,19 @@ d3.csv("data.csv").then(function(demoData, err) {
       .attr("r", 10)
       .classed("stateCircle", true);
 
+          // Partly from Andy McRae's code
+    var fontSize = 10;
+    var abbrGroup = chartGroup.selectAll("null")
+        .data(demoData)
+        .enter()
+        .append("text")
+        .text(d => d.abbr)
+        .attr("x", d => xLinearScale(d.poverty))
+        .attr("y", d => yLinearScale(d.healthcare)+fontSize/2)
+        .attr("font-size", `${fontSize}px`)
+        .classed("stateText", true);
+    
+
     // Create group for 3 x-axis labels
     var labelsGroup = chartGroup.append("g")
       .attr("transform", `translate(${width / 2}, ${height + 20})`);
@@ -186,15 +200,6 @@ d3.csv("data.csv").then(function(demoData, err) {
       .attr("dy", "4em")
       .classed("axis-text", true)
       .text("Lacks Healthcare (%)");
-
-       // Step 6: Initialize tool tip
-    // ==============================
-    // var toolTip = d3.tip()
-    //   .attr("class", "tooltip")
-    //   .offset([0, 0])
-    //   .html(function(d) {
-    //     return (`${d.abbr}`);
-    //   });
 
     // updateToolTip function above csv import
     var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
@@ -263,20 +268,3 @@ d3.csv("data.csv").then(function(demoData, err) {
   }).catch(function(error) {
   console.log(error);
   });
-  //   // Step 7: Create tooltip in the chart
-  //   // ==============================
-  //   chartGroup.call(toolTip);
-
-  //   // Step 8: Create event listeners to display and hide the tooltip
-  //   // ==============================
-  //   circlesGroup.on("click", function(data) {
-  //     toolTip.show(data, this);
-  //   })
-  //     // // onmouseout event
-  //     .on("mouseout", function(data, index) {
-  //       toolTip.hide(data);
-  //     });
-  // });
-// }).catch(function(error) {
-//     console.log(error);
-// });
