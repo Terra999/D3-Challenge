@@ -1,5 +1,7 @@
-console.log("data loaded");
+// Check that app.js loaded
+console.log("app.js loaded");
 
+// Here to line
 var svgWidth = 960;
 var svgHeight = 500;
 
@@ -52,7 +54,8 @@ d3.csv("data.csv").then(function(demoData) {
     // ==============================
     chartGroup.append("g")
       .attr("transform", `translate(0, ${height})`)
-      .call(bottomAxis);
+      .call(bottomAxis
+        .ticks(7));
 
     chartGroup.append("g")
       .call(leftAxis);
@@ -68,16 +71,17 @@ d3.csv("data.csv").then(function(demoData) {
       .attr("r", "10")
       .classed("stateCircle", true);
 
+    // Partly from Andy McRae's code
     var fontSize = 10;
     var abbrGroup = chartGroup.selectAll("null")
         .data(demoData)
         .enter()
         .append("text")
         .text(d => d.abbr)
-        .attr('x', d => xLinearScale(d.poverty))
-        .attr('y', d => yLinearScale(d.healthcare)+fontSize/2)
-        .attr('font-size', `${fontSize}px`)
-        .classed('stateText', true);
+        .attr("x", d => xLinearScale(d.poverty))
+        .attr("y", d => yLinearScale(d.healthcare)+fontSize/2)
+        .attr("font-size", `${fontSize}px`)
+        .classed("stateText", true);
     
 
     // Step 6: Initialize tool tip
