@@ -30,8 +30,8 @@ var chosenXAxis = "poverty";
 function xScale(demoData, chosenXAxis) {
     // create scales
     var xLinearScale = d3.scaleLinear()
-      .domain([d3.min(demoData, d => d[chosenXAxis]), //* 0.8,
-        d3.max(demoData, d => d[chosenXAxis])  // * 1.2
+      .domain([d3.min(demoData, d => d[chosenXAxis]) * 0.8,
+        d3.max(demoData, d => d[chosenXAxis]) * 1.2
       ])
       .range([0, width]);
   
@@ -85,11 +85,11 @@ function xScale(demoData, chosenXAxis) {
     circlesGroup.call(toolTip);
   
     circlesGroup.on("mouseover", function(data) {
-      toolTip.show(data, this);
+      toolTip.show(data);
     })
       // onmouseout event
       .on("mouseout", function(data, index) {
-        toolTip.hide(data, this);
+        toolTip.hide(data);
       });
   
     return circlesGroup;
@@ -98,7 +98,7 @@ function xScale(demoData, chosenXAxis) {
 d3.csv("data.csv").then(function(demoData, err) {
     if (err) throw err;
 
-    // Step 1: Parse Data/Cast as numbers
+    // Parse Data/Cast as numbers
     // ==============================
     demoData.forEach(function(data) {
       data.poverty = +data.poverty;
@@ -114,19 +114,12 @@ d3.csv("data.csv").then(function(demoData, err) {
     // xLinearScale function above csv import
     var xLinearScale = xScale(demoData, chosenXAxis);
 
-    // Step 2: Create scale functions
-    // ==============================
-
-    // var xLinearScale = d3.scaleLinear()
-    //   .domain([8, d3.max(demoData, d => d.poverty)])
-    //   .range([0, width]);
-
     // Create y scale function
     var yLinearScale = d3.scaleLinear()
       .domain([0, d3.max(demoData, d => d.healthcare)])
       .range([height, 0]);
 
-    // Step 3: Create axis functions
+    // Create initial axis functions
     // ==============================
     var bottomAxis = d3.axisBottom(xLinearScale);
     var leftAxis = d3.axisLeft(yLinearScale);
@@ -141,7 +134,7 @@ d3.csv("data.csv").then(function(demoData, err) {
     chartGroup.append("g")
       .call(leftAxis);
 
-    // Step 5: Create Circles
+    // Create Circles
     // ==============================
     var circlesGroup = chartGroup.selectAll("circle")
       .data(demoData)
@@ -177,19 +170,18 @@ d3.csv("data.csv").then(function(demoData, err) {
       .classed("active", true)
       .text("In Poverty (%)");
 
-
     var ageGroup = labelsGroup.append("text")
       .attr("x", 0)
       .attr("y", 40)
       .attr("value", "age")
-      .classed("active", true)
+      .classed("inactive", true)
       .text("Age (Median)");
 
     var incomeGroup = labelsGroup.append("text")
       .attr("x", 0)
       .attr("y", 60)
       .attr("value", "income")
-      .classed("active", true)
+      .classed("inactive", true)
       .text("Household Income (Median)");
 
       // append y axis
@@ -201,70 +193,86 @@ d3.csv("data.csv").then(function(demoData, err) {
       .classed("axis-text", true)
       .text("Lacks Healthcare (%)");
 
+    chartGroup.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "3em")
+      .classed("axis-text", true)
+      .text("Smokes (%)");
+
+    chartGroup.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "2em")
+      .classed("axis-text", true)
+      .text("Obese (%)");
+
     // updateToolTip function above csv import
     var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
      // x axis labels event listener
     labelsGroup.selectAll("text")
-    .on("click", function() {
-      // get value of selection
-      var value = d3.select(this).attr("value");
-      if (value !== chosenXAxis) {
+      .on("click", function() {
+        // get value of selection
+        var value = d3.select(this).attr("value");
+        if (value !== chosenXAxis) {
 
-        // replaces chosenXAxis with value
-        chosenXAxis = value;
+          // replaces chosenXAxis with value
+          chosenXAxis = value;
 
-        console.log(chosenXAxis)
+          // console.log(chosenXAxis)
 
-        // functions here found above csv import
-        // updates x scale for new data
-        xLinearScale = xScale(demoData, chosenXAxis);
+          // functions here found above csv import
+          // updates x scale for new data
+          xLinearScale = xScale(demoData, chosenXAxis);
 
-        // updates x axis with transition
-        xAxis = renderAxes(xLinearScale, xAxis);
+          // updates x axis with transition
+          xAxis = renderAxes(xLinearScale, xAxis);
 
-        // updates circles with new x values
-        circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
+          // updates circles with new x values
+          circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
 
-        // updates tooltips with new info
-        circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+          // updates tooltips with new info
+          circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
-        // changes classes to change bold text
-        if (chosenXAxis === "age") {
-          ageGroup
-            .classed("active", true)
-            .classed("inactive", false);
+          // changes classes to change bold text
+          if (chosenXAxis === "age") {
+            ageGroup
+              .classed("active", true)
+              .classed("inactive", false);
+            povertyGroup
+              .classed("active", false)
+              .classed("inactive", true);
+            incomeGroup
+              .classed("active", false)
+              .classed("inactive", true);
+          }
+          else if (chosenXAxis === "poverty")  {
+            ageGroup
+              .classed("active", false)
+              .classed("inactive", true);
+            povertyGroup
+              .classed("active", true)
+              .classed("inactive", false);
+            incomeGroup
+              .classed("active", false)
+              .classed("inactive", true);
+          }
+          else {
+            ageGroup
+            .classed("active", false)
+            .classed("inactive", true);
           povertyGroup
             .classed("active", false)
             .classed("inactive", true);
           incomeGroup
-            .classed("active", false)
-            .classed("inactive", true);
-        }
-        else if (chosenXAxis === "poverty")  {
-          ageGroup
-            .classed("active", false)
-            .classed("inactive", true);
-          povertyGroup
             .classed("active", true)
             .classed("inactive", false);
-          incomeGroup
-            .classed("active", false)
-            .classed("inactive", true);
+          }
         }
-        else {
-          ageGroup
-          .classed("active", false)
-          .classed("inactive", true);
-        povertyGroup
-          .classed("active", false)
-          .classed("inactive", true);
-        incomeGroup
-          .classed("active", true)
-          .classed("inactive", false);
-        }
-      }
-    });
+      });
   }).catch(function(error) {
   console.log(error);
   });
