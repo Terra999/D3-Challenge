@@ -159,25 +159,25 @@ d3.csv("data.csv").then(function(demoData, err) {
     
 
     // Create group for 3 x-axis labels
-    var labelsGroup = chartGroup.append("g")
+    var xlabelsGroup = chartGroup.append("g")
       .attr("transform", `translate(${width / 2}, ${height + 20})`);
 
     // Create axes labels
-    var povertyGroup = labelsGroup.append("text")
+    var povertyGroup = xlabelsGroup.append("text")
       .attr("x", 0)
       .attr("y", 20)
       .attr("value", "poverty")
       .classed("active", true)
       .text("In Poverty (%)");
 
-    var ageGroup = labelsGroup.append("text")
+    var ageGroup = xlabelsGroup.append("text")
       .attr("x", 0)
       .attr("y", 40)
       .attr("value", "age")
       .classed("inactive", true)
       .text("Age (Median)");
 
-    var incomeGroup = labelsGroup.append("text")
+    var incomeGroup = xlabelsGroup.append("text")
       .attr("x", 0)
       .attr("y", 60)
       .attr("value", "income")
@@ -213,7 +213,7 @@ d3.csv("data.csv").then(function(demoData, err) {
     var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
      // x axis labels event listener
-    labelsGroup.selectAll("text")
+    xlabelsGroup.selectAll("text")
       .on("click", function() {
         // get value of selection
         var value = d3.select(this).attr("value");
