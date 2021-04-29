@@ -1,3 +1,8 @@
+// This code is incomplete. I was unable to get the y-axis labels to be interactive 
+//and I ran out of time. Also, I tried putting the js and css files into separate 
+// folders to tidy things up, but when I did that my code wouldn't work. Even after updating the path
+// in the html file, so I kept everything at the same level.
+
 // Check that bonus.js loaded
 console.log("bonus.js loaded");
 
