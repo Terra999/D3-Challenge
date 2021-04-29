@@ -6,9 +6,9 @@ var svgWidth = 960;
 var svgHeight = 500;
 
 var margin = {
-  top: 20,
+  top: 35,
   right: 40,
-  bottom: 60,
+  bottom: 80,
   left: 100
 };
 
@@ -108,6 +108,14 @@ d3.csv("data.csv").then(function(demoData) {
         toolTip.hide(data, this);
       });
 
+    // Add title to graph
+    chartGroup.append("text")
+      .attr("x", width / 2 )
+      .attr("y", 0 - 20)
+      // .att(d)
+      .attr("class", "axisText")
+      .text("Obesity Rate as Compared to Household Income");
+
     // Create axes labels
     chartGroup.append("text")
       .attr("transform", "rotate(-90)")
@@ -118,7 +126,7 @@ d3.csv("data.csv").then(function(demoData) {
       .text("Obesity (%)");
 
     chartGroup.append("text")
-      .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
+      .attr("transform", `translate(${width / 2}, ${height + margin.top + 20})`)
       .attr("class", "axisText")
       .text("Household Income (Median)");
   }).catch(function(error) {
