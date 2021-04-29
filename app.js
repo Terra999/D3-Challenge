@@ -30,19 +30,19 @@ d3.csv("data.csv").then(function(demoData) {
     // Step 1: Parse Data/Cast as numbers
     // ==============================
     demoData.forEach(function(data) {
-      data.poverty = +data.poverty;
-      data.healthcare = +data.healthcare;
+      data.poverty = +data.income;
+      data.obesity = +data.obesity;
     });
     console.log(demoData);
 
     // Step 2: Create scale functions
     // ==============================
     var xLinearScale = d3.scaleLinear()
-      .domain([8, d3.max(demoData, d => d.poverty)])
+      .domain([35000, d3.max(demoData, d => d.income)])
       .range([0, width]);
 
     var yLinearScale = d3.scaleLinear()
-      .domain([0, d3.max(demoData, d => d.healthcare)])
+      .domain([0, d3.max(demoData, d => d.obesity)])
       .range([height, 0]);
 
     // Step 3: Create axis functions
@@ -66,8 +66,8 @@ d3.csv("data.csv").then(function(demoData) {
       .data(demoData)
       .enter()
       .append("circle")
-      .attr("cx", d => xLinearScale(d.poverty))
-      .attr("cy", d => yLinearScale(d.healthcare))
+      .attr("cx", d => xLinearScale(d.income))
+      .attr("cy", d => yLinearScale(d.obesity))
       .attr("r", "10")
       .classed("stateCircle", true);
 
@@ -78,8 +78,8 @@ d3.csv("data.csv").then(function(demoData) {
         .enter()
         .append("text")
         .text(d => d.abbr)
-        .attr("x", d => xLinearScale(d.poverty))
-        .attr("y", d => yLinearScale(d.healthcare)+fontSize/2)
+        .attr("x", d => xLinearScale(d.income))
+        .attr("y", d => yLinearScale(d.obesity)+fontSize/2)
         .attr("font-size", `${fontSize}px`)
         .classed("stateText", true);
     
@@ -90,7 +90,7 @@ d3.csv("data.csv").then(function(demoData) {
       .attr("class", "tooltip")
       .offset([80, -60])
       .html(function(d) {
-        return (`${d.abbr}<br>Poverty %: ${d.poverty}<br>Healthcare %: ${d.healthcare}`);
+        return (`${d.abbr}<br>Income (Median): ${d.income}<br>Obesity %: ${d.obesity}`);
       });
  
 
@@ -115,12 +115,12 @@ d3.csv("data.csv").then(function(demoData) {
       .attr("x", 0 - (height / 2))
       .attr("dy", "1em")
       .attr("class", "axisText")
-      .text("Lacks Healthcare (%)");
+      .text("Obesity (%)");
 
     chartGroup.append("text")
       .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
       .attr("class", "axisText")
-      .text("In Poverty (%)");
+      .text("Household Income (Median)");
   }).catch(function(error) {
     console.log(error);
   });

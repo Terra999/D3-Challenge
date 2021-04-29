@@ -51,7 +51,7 @@ function xScale(demoData, chosenXAxis) {
   
   // function used for updating circles group with a transition to
   // new circles
-  function renderCircles(circlesGroup, newXScale, chosenXAxis) {
+  function renderCircles(circlesGroup, newXScale, chosenXAxis, ) {
   
     circlesGroup.transition()
       .duration(700)
@@ -152,7 +152,7 @@ d3.csv("data.csv").then(function(demoData, err) {
         .enter()
         .append("text")
         .text(d => d.abbr)
-        .attr("x", d => xLinearScale(d.poverty))
+        .attr("x", d => xLinearScale(d.chosenXAxis))
         .attr("y", d => yLinearScale(d.healthcare)+fontSize/2)
         .attr("font-size", `${fontSize}px`)
         .classed("stateText", true);
